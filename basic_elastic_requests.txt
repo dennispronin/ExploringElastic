@@ -1,0 +1,155 @@
+- Kibana's web console for interacting with Elastic through its REST API
+http://{host}:{port}/app/dev_tools#/console
+
+- Create an index:
+PUT /my-index
+
+- Create an index with specified settings:
+PUT /my-index
+{
+    "mappings": {
+        "properties": {
+            "name": {
+                "type": "text"
+            },
+            "age": {
+                "type":"integer"
+            }
+        }
+    },
+    "settings": {
+        "number_of_replicas": 3, // (with number_of_shards = 2 there will be total 6 shards as 3 replicas per shard)
+        "number_of_shards": 2,
+        "analysis": {
+            "analyzer": {
+                "stopwords": {
+                    "type": "standard",
+                    "stopword": "_english_"
+                }
+            }
+        }
+    }
+}
+
+- Add a document to my-index:
+POST /my-index/_doc
+{
+    "name": "Denis",
+    "age": 27
+}
+
+- Add a document to my-index with specified primary key:
+POST/PUT /my-index/_doc/1
+{
+    "name":"Denis",
+    "age": 27
+}
+
+- Get document by id:
+GET /my-index/_doc/1
+
+- Search specific data in my-index:
+GET /my-index/_search
+GET /my-index/_search?q="rocky mountain"
+GET /my-index/_search?q=name:Denis AND age:27
+
+- Search all data in my-index with Query DSL:
+GET /my-index/_search
+{
+    "size": 20,
+    "query": {
+        "match_all": {}
+    }
+}
+
+- Search specific data in my-index with Query DSL:
+GET /my-index/_search
+{
+    "query": {
+        "match": {
+            "name": "Denis"
+        }
+    },
+    "sort": [ // if not specified, the data will be sorted by _score DESC
+        {
+            "age": {
+                "order": "desc"
+            }
+        }
+    ]
+}
+
+- Search specific data in my-index with Query DSL and fuzzy search
+GET /my-index/_search
+{
+    "query": {
+        "fuzzy": {
+            "name": {
+                "value": "Densi",
+                "fuzziness": 2
+            }
+        }
+    }
+}
+
+GET /my-index/_search
+{
+    "query": {
+        "match": {
+            "name": {
+                "query": "Densi",
+                "fuzziness": 1
+            }
+        }
+    }
+}
+
+- Information on index structure:
+GET my-index
+
+- Information on index mapping:
+GET /my-index/_mapping
+
+- Information on index settings:
+GET /my-index/_settings
+
+- Delete index:
+DELETE my-index
+
+- Delete document:
+DELETE /my-index/_doc/1
+
+- Delete by query:
+POST /my-index/_delete_by_query
+{
+    "query": {
+        "match": {
+            "name": "Denis"
+        }
+    }
+}
+
+- Analyze API:
+GET _analyze
+{
+    "text": "Denis is awesome"
+}
+
+same as
+
+GET _analyze
+{
+    "text": "Denis is awesome",
+    "analyzer": "standard"
+}
+
+Other analyzers:
+simple - will remove all non-character symbols
+keyword - all input text will be analyzed as a single token
+
+- Cluster health:
+GET _cluster/health
+
+- CAT API - Monitoring an Elasticsearch cluster:
+GET _cat/
+GET _cat/health/?v
