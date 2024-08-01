@@ -1,5 +1,15 @@
 version: '3.0'
 services:
+  songs-db:
+    image: 'postgres:12.12'
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=songs_db
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+    volumes:
+      - "postgres_data:/usr/share/postgres/data"
   elasticsearch:
     image: "docker.elastic.co/elasticsearch/elasticsearch:8.14.3"
     ports:
@@ -9,6 +19,10 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - xpack.license.self_generated.type=basic
+      - cluster.routing.allocation.disk.watermark.low=90%
+      - cluster.routing.allocation.disk.watermark.high=95%
+      - cluster.routing.allocation.disk.watermark.flood_stage=98%
+      - cluster.routing.allocation.disk.threshold_enabled=false
     volumes:
       - "elasticsearch_data:/usr/share/elasticsearch/data"
   kibana:
@@ -22,4 +36,5 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - xpack.license.self_generated.type=basic
 volumes:
+  postgres_data:
   elasticsearch_data:

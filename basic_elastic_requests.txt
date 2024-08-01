@@ -147,9 +147,19 @@ Other analyzers:
 simple - will remove all non-character symbols
 keyword - all input text will be analyzed as a single token
 
-- Cluster health:
-GET _cluster/health
-
-- CAT API - Monitoring an Elasticsearch cluster:
+- Monitoring an Elasticsearch cluster:
 GET _cat/
 GET _cat/health/?v
+GET _cat/nodes?v
+GET _cat/nodes?v&h=name,disk.used_percent
+GET _cluster/health
+GET _cluster/allocation/explain
+GET _nodes/stats
+
+- Updating Elasticsearch cluster settings
+PUT /_cluster/settings
+{
+  "transient": {
+    "cluster.routing.allocation.disk.threshold_enabled": false
+  }
+}
